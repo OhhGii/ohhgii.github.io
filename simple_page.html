@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的简单网页</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%);
+            --text-color: #0f172a;
+            --content-bg: rgba(255,255,255,0.75);
+            --card-bg: rgba(255,255,255,0.6);
+            --accent: #2563eb;
+            --muted: rgba(0,0,0,0.08);
+        }
+        body.dark {
+            --bg-gradient: linear-gradient(135deg, #0b1220 0%, #111827 100%);
+            --text-color: #e5e7eb;
+            --content-bg: rgba(17,24,39,0.7);
+            --card-bg: rgba(17,24,39,0.55);
+            --accent: #8b5cf6;
+            --muted: rgba(255,255,255,0.12);
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-gradient);
+            min-height: 100vh;
+        }
+
+        #starfield { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
+
+        header { text-align: center; padding: 48px 0 24px; color: white; }
+
+        .hero {
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            gap: 18px; padding: 48px 28px; border-radius: 18px; background: var(--content-bg);
+            backdrop-filter: blur(10px); box-shadow: 0 10px 30px var(--muted);
+        }
+        .hero h1 { font-size: 56px; letter-spacing: 0.5px; }
+        .hero p { opacity: 0.9; font-size: 18px; }
+
+        .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 10px; }
+        .btn { display: inline-block; background: var(--accent); color: white; padding: 12px 22px; text-decoration: none; border-radius: 999px; transition: transform .2s ease, box-shadow .2s ease; border: none; cursor: pointer; font-size: 16px; }
+        .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 28px; }
+        .feature { background: var(--card-bg); padding: 20px; border-radius: 14px; box-shadow: 0 6px 18px var(--muted); }
+        .feature h3 { color: var(--accent); margin-bottom: 6px; font-size: 16px; }
+        .feature p { font-size: 14px; opacity: .9; }
+
+        footer { text-align: center; padding: 22px; color: white; opacity: 0.8; }
+
+        .header-actions { margin-top: 16px; }
+
+        #backToTop { position: fixed; right: 20px; bottom: 20px; display: none; z-index: 1001; }
+        #backToTop.show { display: inline-block; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 36px; }
+            .hero { padding: 32px 18px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+
+    <div class="container">
+        <header>
+            <h1 style="text-shadow:2px 2px 4px rgba(0,0,0,0.25)">Welcome</h1>
+            <div class="header-actions">
+                <button id="themeToggle" class="btn secondary">切换主题</button>
+            </div>
+        </header>
+
+        <section class="hero">
+            <h1>更简约，更专注</h1>
+            <p>一个清爽的页面示例，配以细节动画与星空背景。</p>
+            <div class="actions">
+                <a class="btn" href="click.html">点击我</a>
+                <a class="btn" href="modal.html">打开弹窗</a>
+                <a class="btn secondary" href="about.html">了解更多</a>
+            </div>
+            <div class="features">
+                <div class="feature"><h3>轻</h3><p>简洁的布局与柔和的毛玻璃质感。</p></div>
+                <div class="feature"><h3>快</h3><p>无依赖，原生实现动画与交互。</p></div>
+                <div class="feature"><h3>美</h3><p>统一的配色与微交互，让视觉更舒适。</p></div>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 极简网页示例</p>
+        </footer>
+    </div>
+
+    <button id="backToTop" class="btn" aria-label="返回顶部">返回顶部</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 主题
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') document.body.classList.add('dark');
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark');
+                const mode = document.body.classList.contains('dark') ? 'dark' : 'light';
+                localStorage.setItem('theme', mode);
+                themeToggle.textContent = mode === 'dark' ? '切换为亮色' : '切换主题';
+            });
+            themeToggle.textContent = document.body.classList.contains('dark') ? '切换为亮色' : '切换主题';
+
+            // 返回顶部
+            const backToTop = document.getElementById('backToTop');
+            window.addEventListener('scroll', function() {
+                backToTop.classList.toggle('show', window.scrollY > 300);
+            });
+            backToTop.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+            // 星空动画
+            const canvas = document.getElementById('starfield');
+            const ctx = canvas.getContext('2d');
+            let stars = []; let width = 0, height = 0, dpr = Math.max(1, window.devicePixelRatio || 1);
+            function resize(){ width=innerWidth; height=innerHeight; canvas.style.width = width+'px'; canvas.style.height = height+'px'; canvas.width = Math.floor(width*dpr); canvas.height = Math.floor(height*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); initStars(); }
+            function initStars(){ const density = Math.max(60, Math.floor((width*height)/15000)); stars = new Array(density).fill(0).map(()=>({ x:Math.random()*width, y:Math.random()*height, r:Math.random()*1.4+0.2, sx:(Math.random()*2-1)*(0.05+Math.random()*0.25), sy:(Math.random()*2-1)*(0.05+Math.random()*0.25), p:Math.random()*Math.PI*2, sp:0.01+Math.random()*0.02 })); }
+            function step(){ ctx.clearRect(0,0,width,height); const dark=document.body.classList.contains('dark'); const col= dark?'rgba(255,255,255,':'rgba(255,255,240,'; for(const s of stars){ s.x+=s.sx; s.y+=s.sy; if(s.x<-5)s.x=width+5; if(s.x>width+5)s.x=-5; if(s.y<-5)s.y=height+5; if(s.y>height+5)s.y=-5; s.p+=s.sp; const a=0.4+0.6*Math.abs(Math.sin(s.p)); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle = col + a + ')'; ctx.shadowBlur=8; ctx.shadowColor = dark?'rgba(255,255,255,0.6)':'rgba(255,255,200,0.5)'; ctx.fill(); } ctx.shadowBlur=0; requestAnimationFrame(step); }
+            addEventListener('resize', resize); resize(); requestAnimationFrame(step);
+        });
+
+        // 入场动画
+        const style = document.createElement('style');
+        style.textContent = `@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} .hero{animation:fadeInUp .6s ease both}`;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html> 

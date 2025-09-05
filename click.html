@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点击我 - 互动演示</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:linear-gradient(135deg,#0ea5e9 0%,#1d4ed8 100%);--text:#0f172a;--glass:rgba(255,255,255,.75);--accent:#2563eb}
+        body.dark{--bg:linear-gradient(135deg,#0b1220 0%,#111827 100%);--text:#e5e7eb;--glass:rgba(17,24,39,.7);--accent:#8b5cf6}
+        body{font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);min-height:100vh}
+        #star{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+        .wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:28px}
+        .card{margin-top:60px;background:var(--glass);backdrop-filter:blur(10px);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.15);padding:40px;text-align:center}
+        h1{font-size:42px;margin-bottom:8px}
+        p{opacity:.9}
+        .btn{display:inline-block;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:14px 26px;font-size:18px;cursor:pointer;position:relative;overflow:hidden}
+        .btn:active{transform:translateY(1px)}
+        .link{display:inline-block;margin-top:18px;color:var(--accent);text-decoration:none}
+        .counter{font-size:48px;margin:16px 0}
+        .ripple{position:absolute;border-radius:50%;transform:scale(0);animation:ripple .6s linear;background:rgba(255,255,255,.6)}
+        @keyframes ripple{to{transform:scale(4);opacity:0}}
+    </style>
+</head>
+<body>
+    <canvas id="star"></canvas>
+    <div class="wrap">
+        <div class="card">
+            <h1>点击与涟漪</h1>
+            <p>每次点击都会产生涟漪，并记录次数。</p>
+            <div class="counter" id="count">0</div>
+            <button class="btn" id="clickBtn">点击我</button>
+            <a class="link" href="simple_page.html">返回首页</a>
+        </div>
+    </div>
+    <script>
+        // 计数与涟漪
+        let n=0; const count=document.getElementById('count'); const btn=document.getElementById('clickBtn');
+        btn.addEventListener('click', function(e){ n++; count.textContent=n; const r=document.createElement('span'); const rect=this.getBoundingClientRect(); const size=Math.max(rect.width, rect.height); r.style.width=r.style.height=size+'px'; r.style.left=(e.clientX-rect.left-size/2)+'px'; r.style.top=(e.clientY-rect.top-size/2)+'px'; r.className='ripple'; this.appendChild(r); setTimeout(()=>r.remove(),600); });
+
+        // 星空
+        const c=document.getElementById('star'),x=c.getContext('2d'); let w=0,h=0,d=window.devicePixelRatio||1,s=[]; function R(){w=innerWidth;h=innerHeight;c.style.width=w+'px';c.style.height=h+'px';c.width=Math.floor(w*d);c.height=Math.floor(h*d);x.setTransform(d,0,0,d,0,0);S()} function S(){const k=Math.max(60,Math.floor(w*h/15000)); s=new Array(k).fill(0).map(()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.3+.2,sx:(Math.random()*2-1)*.2,sy:(Math.random()*2-1)*.2,p:Math.random()*6.28,sp:.02}));} function step(){x.clearRect(0,0,w,h); for(const a of s){a.x+=a.sx; a.y+=a.sy; if(a.x<-5)a.x=w+5; if(a.x>w+5)a.x=-5; if(a.y<-5)a.y=h+5; if(a.y>h+5)a.y=-5; a.p+=a.sp; const al=.5+.5*Math.abs(Math.sin(a.p)); x.beginPath(); x.arc(a.x,a.y,a.r,0,Math.PI*2); x.fillStyle='rgba(255,255,255,'+al+')'; x.fill(); } requestAnimationFrame(step);} addEventListener('resize',R); R(); requestAnimationFrame(step);
+    </script>
+</body>
+</html> 
