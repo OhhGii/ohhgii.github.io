@@ -1,142 +1,990 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的简单网页</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg-gradient: linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%);
-            --text-color: #0f172a;
-            --content-bg: rgba(255,255,255,0.75);
-            --card-bg: rgba(255,255,255,0.6);
-            --accent: #2563eb;
-            --muted: rgba(0,0,0,0.08);
-        }
-        body.dark {
-            --bg-gradient: linear-gradient(135deg, #0b1220 0%, #111827 100%);
-            --text-color: #e5e7eb;
-            --content-bg: rgba(17,24,39,0.7);
-            --card-bg: rgba(17,24,39,0.55);
-            --accent: #8b5cf6;
-            --muted: rgba(255,255,255,0.12);
-        }
-
-        body {
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
-            line-height: 1.6;
-            color: var(--text-color);
-            background: var(--bg-gradient);
-            min-height: 100vh;
-        }
-
-        #starfield { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-
-        .container { max-width: 1100px; margin: 0 auto; padding: 24px; position: relative; z-index: 1; }
-
-        header { text-align: center; padding: 48px 0 24px; color: white; }
-
-        .hero {
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            gap: 18px; padding: 48px 28px; border-radius: 18px; background: var(--content-bg);
-            backdrop-filter: blur(10px); box-shadow: 0 10px 30px var(--muted);
-        }
-        .hero h1 { font-size: 56px; letter-spacing: 0.5px; }
-        .hero p { opacity: 0.9; font-size: 18px; }
-
-        .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 10px; }
-        .btn { display: inline-block; background: var(--accent); color: white; padding: 12px 22px; text-decoration: none; border-radius: 999px; transition: transform .2s ease, box-shadow .2s ease; border: none; cursor: pointer; font-size: 16px; }
-        .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 28px; }
-        .feature { background: var(--card-bg); padding: 20px; border-radius: 14px; box-shadow: 0 6px 18px var(--muted); }
-        .feature h3 { color: var(--accent); margin-bottom: 6px; font-size: 16px; }
-        .feature p { font-size: 14px; opacity: .9; }
-
-        footer { text-align: center; padding: 22px; color: white; opacity: 0.8; }
-
-        .header-actions { margin-top: 16px; }
-
-        #backToTop { position: fixed; right: 20px; bottom: 20px; display: none; z-index: 1001; }
-        #backToTop.show { display: inline-block; }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 36px; }
-            .hero { padding: 32px 18px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>收益定价系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:#f5f6fa;color:#464646;font-size:14px}
+.app{display:flex;min-height:100vh}
+.sidebar{width:200px;background:#001529;position:fixed;height:100vh;overflow-y:auto;z-index:50}
+.sidebar-logo{padding:16px 20px;font-size:15px;font-weight:bold;color:#fff;border-bottom:1px solid #0d2f4f;background:#002140}
+.nav-item{padding:12px 24px;cursor:pointer;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.65);transition:all .2s;font-size:14px}
+.nav-item:hover{color:#fff;background:#0a2e4e}
+.nav-item.active{background:#1890ff;color:#fff}
+.main{margin-left:200px;flex:1;min-height:100vh}
+.header{background:#fff;padding:12px 24px;border-bottom:1px solid #e8e8e8}
+.breadcrumb{color:#999;font-size:13px}
+.breadcrumb a{color:#1890ff;text-decoration:none;cursor:pointer}
+.breadcrumb .sep{margin:0 6px}
+.body{padding:20px 24px}
+.page{display:none}
+.page.active{display:block}
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:4px;margin-bottom:16px}
+.card-header{padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:15px;font-weight:500}
+.search-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;padding:20px 24px 8px}
+.field{display:flex;align-items:center;margin-bottom:14px}
+.field label{min-width:120px;text-align:right;padding-right:10px;color:#666;font-size:13px;white-space:nowrap}
+.field input,.field select{flex:1;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;outline:none;min-width:0}
+.field input:focus,.field select:focus{border-color:#1890ff}
+.field .range{display:flex;align-items:center;gap:4px;flex:1}
+.field .range input{width:80px;flex:none}
+.actions{display:flex;justify-content:flex-end;gap:8px;padding:8px 24px 16px}
+.btn{padding:6px 16px;border-radius:4px;cursor:pointer;font-size:13px;border:1px solid transparent;transition:all .15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.btn-p{background:#1890ff;color:#fff;border-color:#1890ff}
+.btn-p:hover{background:#40a9ff}
+.btn-p:disabled{background:#d9d9d9;border-color:#d9d9d9;cursor:not-allowed}
+.btn-g{background:#fff;color:#1890ff;border-color:#1890ff}
+.btn-g:hover{background:#e6f7ff}
+.btn-d{background:#fff;color:#666;border-color:#d9d9d9}
+.btn-d:hover{color:#1890ff;border-color:#1890ff}
+.btn:disabled,.btn-d:disabled{background:#f5f5f5;color:#bfbfbf;border-color:#d9d9d9;cursor:not-allowed}
+.btn-d:disabled:hover{color:#bfbfbf;border-color:#d9d9d9}
+.btn-link{background:none;border:none;color:#1890ff;padding:2px 6px;font-size:12px;cursor:pointer}
+.btn-link:hover{color:#40a9ff}
+.btn-link.red{color:#f5222d}
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th,.tbl td{border-bottom:1px solid #f0f0f0;padding:9px 12px;text-align:left;white-space:nowrap}
+.tbl th{background:#fafafa;font-weight:500;color:#333;position:sticky;top:0}
+.tbl tbody tr:hover{background:#e6f7ff}
+.pager{padding:12px 16px;display:flex;justify-content:flex-end;align-items:center;gap:6px;border-top:1px solid #f0f0f0}
+.pager-info{color:#999;font-size:12px}
+.tag{padding:2px 8px;border-radius:3px;font-size:12px;display:inline-block}
+.tag-green{background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f}
+.tag-red{background:#fff2f0;color:#f5222d;border:1px solid #ffccc7}
+.tag-gray{background:#f5f5f5;color:#666;border:1px solid #d9d9d9}
+.tag-orange{background:#fff7e6;color:#fa8c16;border:1px solid #ffd591}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:1000;display:none;justify-content:center;align-items:center}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:6px;max-height:85vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.modal-sm{width:520px}.modal-md{width:720px}.modal-lg{width:960px}
+.modal-hd{padding:16px 24px;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center}
+.modal-hd h3{font-size:16px;font-weight:600}
+.modal-x{cursor:pointer;font-size:20px;color:#999;background:none;border:none}
+.modal-x:hover{color:#333}
+.modal-bd{padding:24px}
+.modal-ft{padding:12px 24px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px}
+.detail-card{background:#fff;border:1px solid #e8e8e8;border-radius:4px;padding:24px 32px;max-width:1100px}
+.sec-title{display:flex;align-items:center;margin:24px 0 16px}
+.sec-title:first-child{margin-top:0}
+.sec-title::before{content:'';width:4px;height:16px;background:#1890ff;margin-right:10px;border-radius:2px}
+.sec-title span{font-size:15px;font-weight:600;color:#333}
+.sec-title .refresh{margin-left:10px;color:#1890ff;cursor:pointer;font-size:13px}
+.fi{display:flex;align-items:flex-start;margin-bottom:14px}
+.fi .lbl{width:160px;text-align:right;padding-right:12px;line-height:32px;color:#333;flex-shrink:0;font-size:13px}
+.fi .lbl.req::before{content:'*';color:#f5222d;margin-right:3px}
+.fi .ctl{flex:1}
+.fi .ctl input[type="text"],.fi .ctl input[type="number"]{width:260px;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;outline:none}
+.fi .ctl input:focus{border-color:#1890ff}
+.fi .ctl select{width:260px;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;outline:none}
+.fi .ctl textarea{width:320px;border:1px solid #d9d9d9;border-radius:4px;padding:8px 10px;font-size:13px;outline:none;resize:vertical}
+.rg,.cg{display:flex;flex-wrap:wrap;gap:12px;align-items:center;min-height:32px}
+.ri,.ci{display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;font-size:13px}
+.btn-center{display:flex;justify-content:center;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #f0f0f0}
+.collapse{border:1px solid #e8e8e8;border-radius:4px;margin-bottom:8px}
+.collapse-hd{padding:10px 14px;background:#fafafa;cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:500;font-size:13px}
+.collapse-hd .arr{transition:transform .2s;display:inline-block;font-size:10px}
+.collapse-hd.open .arr{transform:rotate(90deg)}
+.collapse-bd{padding:14px;display:none;border-top:1px solid #e8e8e8}
+.collapse-bd.open{display:block}
+.cond-group{border:1px solid #e8e8e8;border-radius:4px;padding:12px;margin:8px 0;background:#fafbfc}
+.cond-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.cond-rel{background:#1890ff;color:#fff;padding:2px 8px;border-radius:3px;font-size:12px}
+/* 标签体系 */
+.tag-group{border:1px solid #e8e8e8;border-radius:6px;padding:14px;margin-bottom:12px;background:#fafbfc}
+.tag-group-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tag-group-no{background:#1890ff;color:#fff;padding:3px 10px;border-radius:3px;font-size:12px;white-space:nowrap}
+.tag-group-name{height:30px;font-size:13px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;width:240px}
+.tag-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.tag-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag-no{font-size:12px;color:#888;min-width:42px;font-family:monospace}
+.tag-rel{height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;width:56px}
+.tag-rel-first{font-size:12px;color:#aaa;width:56px;text-align:center}
+.tag-op{height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;width:90px;padding:0 4px}
+.tag-picker{position:relative;width:200px}
+.tag-picker-trigger{display:flex;align-items:center;justify-content:space-between;height:28px;border:1px solid #d9d9d9;border-radius:3px;padding:0 8px;font-size:12px;cursor:pointer;background:#fff}
+.tag-picker-trigger:hover{border-color:#1890ff}
+.tag-picker-text{color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag-picker-arr{color:#999;font-size:10px;margin-left:4px}
+.tag-picker-pop{display:none;position:absolute;z-index:30;top:32px;left:0;width:280px;background:#fff;border:1px solid #e8e8e8;border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.tag-picker-pop.show{display:block}
+.tag-search-wrap{padding:8px;border-bottom:1px solid #f0f0f0}
+.tag-search{width:100%;height:30px;font-size:12px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;box-sizing:border-box}
+.tag-picker-body{max-height:260px;overflow-y:auto;padding:4px 0}
+.tag-cat-hd{font-size:11px;color:#999;background:#f7f8fa;padding:4px 12px;position:sticky;top:0}
+.tag-opt{font-size:12px;padding:6px 16px;cursor:pointer;color:#333}
+.tag-opt:hover{background:#e6f7ff;color:#1890ff}
+.adj-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.adj-tbl th,.adj-tbl td{border:1px solid #e8e8e8;padding:9px 12px;text-align:left}
+.adj-tbl th{background:#fafafa;font-weight:500}
+.comm-ctrl{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.comm-ctrl select{width:130px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 6px}
+.comm-ctrl input{width:55px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 6px;text-align:center}
+.comp-card{border:1px solid #e8e8e8;border-radius:4px;padding:14px;margin-bottom:10px;background:#fafbfc}
+.comp-card h4{margin-bottom:10px;color:#333;font-size:13px;font-weight:600}
+.comp-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.comp-row>label{min-width:80px;text-align:right;color:#666;font-size:12px;flex-shrink:0}
+.comp-row .ig{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.comp-row .ig select{height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 6px}
+.comp-row .ig input{height:28px;width:55px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 6px;text-align:center}
+.hint{color:#999;font-size:12px;margin-top:4px}
+.upload-box{border:1px dashed #d9d9d9;border-radius:4px;padding:20px;text-align:center;cursor:pointer}
+.upload-box:hover{border-color:#1890ff}
+.ab-cfg{border:1px solid #e8e8e8;border-radius:4px;padding:14px;margin-top:10px;background:#fafbfc}
+.ab-grp{display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;background:#fff;border:1px solid #e8e8e8;border-radius:4px}
+.diff-wrap{display:flex;gap:16px}
+.diff-new{flex:1;background:#f6ffed;border:1px solid #b7eb8f;border-radius:4px;padding:16px}
+.diff-old{flex:1;background:#fff2f0;border:1px solid #ffccc7;border-radius:4px;padding:16px}
+</style>
 </head>
 <body>
-    <canvas id="starfield"></canvas>
+<div class="app">
+<nav class="sidebar">
+<div class="sidebar-logo">收益定价系统</div>
+<div class="nav-item" id="nav-activity" onclick="go('activity-list')"><span>🎯</span> 定价活动管理</div>
+<div class="nav-item active" id="nav-strategy" onclick="go('strategy-list')"><span>📊</span> 策略管理</div>
+</nav>
+<main class="main">
+<div class="header"><div class="breadcrumb" id="bc"></div></div>
+<div class="body">
 
-    <div class="container">
-        <header>
-            <h1 style="text-shadow:2px 2px 4px rgba(0,0,0,0.25)">Welcome</h1>
-            <div class="header-actions">
-                <button id="themeToggle" class="btn secondary">切换主题</button>
-            </div>
-        </header>
+<!-- ======================= 策略列表 ======================= -->
+<div class="page active" id="p-strategy-list">
+<div class="card">
+<div class="search-grid">
+<div class="field"><label>策略ID</label><input type="number" placeholder="请输入策略ID"></div>
+<div class="field"><label>策略名称</label><input type="text" placeholder="请输入策略名称"></div>
+<div class="field"><label>策略类型</label><select><option value="">全部</option><option value="base-pricing">基础定价</option><option value="overlay-pricing">叠加定价</option><option value="model-pricing">模型定价</option><option value="base-subsidy">基础补贴</option><option value="overlay-subsidy">叠加补贴</option><option value="comp-chase">竞争追价</option><option value="algo-subsidy">算法补贴</option></select></div>
+<div class="field"><label>创建人</label><input type="text" placeholder="请输入创建人"></div>
+<div class="field"><label>业务线</label><select id="sl-biz" onchange="slBizChange()"><option value="">请选择</option><option value="1">国内</option><option value="2">境外</option></select></div>
+<div class="field"><label>业务类型</label><select id="sl-scene"><option value="">请先选择业务线</option></select></div>
+</div>
+<div class="actions">
+<button class="btn btn-p" onclick="alert('需同时选择业务线和业务类型后发起查询')">查询</button>
+<button class="btn btn-d">重置</button>
+<button class="btn btn-p" onclick="go('strategy-create')">+ 新建</button>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-title">策略列表</span></div>
+<div class="tbl-wrap">
+<table class="tbl">
+<thead><tr><th>策略ID</th><th>策略名称</th><th>策略类型</th><th>策略说明</th><th>创建人</th><th>创建时间</th><th>最近修改人</th><th>最近修改时间</th><th>业务线</th><th>业务类型</th><th style="min-width:200px">操作</th></tr></thead>
+<tbody>
+<tr><td>10234</td><td>境内收益竞争追价策略A</td><td><span class="tag tag-green">竞争追价</span></td><td>针对OTA竞对追价</td><td>zhangsan</td><td>2024-03-15 10:30</td><td>lisi</td><td>2024-06-01 14:22</td><td>国内</td><td>收益</td><td><button class="btn-link" onclick="go('strategy-view')">查看</button><button class="btn-link" onclick="go('strategy-edit')">编辑</button><button class="btn-link" onclick="go('strategy-copy')">复制</button><button class="btn-link" onclick="openM('m-slog')">日志</button></td></tr>
+<tr><td>10235</td><td>境内规模基础定价策略B</td><td><span class="tag tag-green">基础定价</span></td><td>规模酒店供需调佣</td><td>wangwu</td><td>2024-04-20 09:15</td><td>wangwu</td><td>2024-05-28 16:40</td><td>国内</td><td>规模</td><td><button class="btn-link" onclick="go('strategy-view')">查看</button><button class="btn-link" onclick="go('strategy-edit')">编辑</button><button class="btn-link" onclick="go('strategy-copy')">复制</button><button class="btn-link" onclick="openM('m-slog')">日志</button></td></tr>
+<tr><td>10236</td><td>境外分销叠加定价策略</td><td><span class="tag tag-orange">叠加定价</span></td><td>境外分销叠加定价</td><td>zhaoliu</td><td>2024-05-10 11:00</td><td>zhaoliu</td><td>2024-06-05 09:30</td><td>境外</td><td>分销</td><td><button class="btn-link" onclick="go('strategy-view')">查看</button><button class="btn-link" onclick="go('strategy-edit')">编辑</button><button class="btn-link" onclick="go('strategy-copy')">复制</button><button class="btn-link" onclick="openM('m-slog')">日志</button></td></tr>
+<tr><td>10237</td><td>境内收益基础补贴策略</td><td><span class="tag tag-green">基础补贴</span></td><td>收益酒店基础补贴</td><td>lisi</td><td>2024-05-15 09:00</td><td>lisi</td><td>2024-06-10 11:30</td><td>国内</td><td>收益</td><td><button class="btn-link" onclick="go('strategy-view')">查看</button><button class="btn-link" onclick="go('strategy-edit')">编辑</button><button class="btn-link" onclick="go('strategy-copy')">复制</button><button class="btn-link" onclick="openM('m-slog')">日志</button></td></tr>
+<tr><td>10238</td><td>境内模型定价策略</td><td><span class="tag tag-orange">模型定价</span></td><td>规模模型智能定价</td><td>wangwu</td><td>2024-06-01 10:00</td><td>wangwu</td><td>2024-06-12 14:00</td><td>国内</td><td>规模</td><td><button class="btn-link" onclick="go('strategy-view')">查看</button><button class="btn-link" onclick="go('strategy-edit')">编辑</button><button class="btn-link" onclick="go('strategy-copy')">复制</button><button class="btn-link" onclick="openM('m-slog')">日志</button></td></tr>
+</tbody>
+</table>
+</div>
+<div class="pager"><span class="pager-info">共 5 条</span><button class="btn btn-d" style="padding:3px 8px;font-size:12px" disabled>&lt;</button><button class="btn btn-p" style="padding:3px 8px;font-size:12px">1</button><button class="btn btn-d" style="padding:3px 8px;font-size:12px" disabled>&gt;</button></div>
+</div>
+</div>
 
-        <section class="hero">
-            <h1>更简约，更专注</h1>
-            <p>一个清爽的页面示例，配以细节动画与星空背景。</p>
-            <div class="actions">
-                <a class="btn" href="click.html">点击我</a>
-                <a class="btn" href="modal.html">打开弹窗</a>
-                <a class="btn secondary" href="about.html">了解更多</a>
-            </div>
-            <div class="features">
-                <div class="feature"><h3>轻</h3><p>简洁的布局与柔和的毛玻璃质感。</p></div>
-                <div class="feature"><h3>快</h3><p>无依赖，原生实现动画与交互。</p></div>
-                <div class="feature"><h3>美</h3><p>统一的配色与微交互，让视觉更舒适。</p></div>
-            </div>
-        </section>
+<!-- ======================= 策略详情（新建/编辑/查看/复制） ======================= -->
+<div class="page" id="p-strategy-detail">
+<div class="detail-card">
+<div class="sec-title" style="margin-top:0"><span>基础信息</span></div>
+<div class="fi"><label class="lbl req">定价策略名称</label><div class="ctl"><input type="text" placeholder="请输入，最多40字" maxlength="40"></div></div>
+<div class="fi"><label class="lbl req">定价策略描述</label><div class="ctl"><textarea rows="3" placeholder="请输入，最多150字" maxlength="150"></textarea></div></div>
+<div class="fi"><label class="lbl req">业务线</label><div class="ctl"><select id="sd-biz" onchange="sdBizChange()"><option value="">请选择</option><option value="1">国内</option><option value="2">境外</option></select></div></div>
+<div class="fi"><label class="lbl req">业务类型</label><div class="ctl"><select id="sd-scene" onchange="sdSceneChange()"><option value="">请先选择业务线</option></select></div></div>
+<div class="fi"><label class="lbl req">策略类型</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="sd-cat" value="base-pricing" checked onchange="sdCatChange()"> 基础定价</label><label class="ri"><input type="radio" name="sd-cat" value="overlay-pricing" onchange="sdCatChange()"> 叠加定价</label><label class="ri"><input type="radio" name="sd-cat" value="model-pricing" onchange="sdCatChange()"> 模型定价</label><label class="ri"><input type="radio" name="sd-cat" value="base-subsidy" onchange="sdCatChange()"> 基础补贴</label><label class="ri"><input type="radio" name="sd-cat" value="overlay-subsidy" onchange="sdCatChange()"> 叠加补贴</label><label class="ri"><input type="radio" name="sd-cat" value="comp-chase" onchange="sdCatChange()"> 竞争追价</label><label class="ri"><input type="radio" name="sd-cat" value="algo-subsidy" onchange="sdCatChange()"> 算法补贴</label></div></div></div>
+<div class="fi" id="sd-realprice-row" style="display:none"><label class="lbl req">定实价</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="sd-realprice" value="1"> 是</label><label class="ri"><input type="radio" name="sd-realprice" value="0" checked> 否</label></div><div class="tip" style="margin-top:4px;color:#999;font-size:12px">仅"基础定价"且"国内住宿-规模定价"时可配置</div></div></div>
+<div class="fi" id="sd-model-type-row" style="display:none"><label class="lbl req">模型类型</label><div class="ctl"><select id="sd-model-type" style="width:380px"><option value="">请选择</option><option>一天多调（正式版）|一天一调（正式版）</option><option>一天多调（正式版）|一天一调（转化率实验版）</option><option>一天多调（正式版）|一天一调（强化学习实验版）</option><option>一天多调（正式版）|一天一调（多价量融合）</option></select></div></div>
+<div class="fi" id="sd-algo-model-row" style="display:none"><label class="lbl req">算法补贴模型类型</label><div class="ctl"><select id="sd-algo-model" style="width:380px"><option value="">请选择</option><option>酒店补贴（全局优化）</option><option>敏感度模型—对齐固定货补</option><option>敏感度模型—对齐规则组</option><option>全局优化（GMV）+敏感度模型</option><option>全局优化（GMV）</option></select></div></div>
 
-        <footer>
-            <p>&copy; 2024 极简网页示例</p>
-        </footer>
-    </div>
+<!-- 规则信息 -->
+<div class="sec-title"><span>规则信息</span></div>
+<div class="fi"><label class="lbl req">生效渠道</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox" value="0" onchange="chCh(0,this)"> 美团APP</label><label class="ci"><input type="checkbox" value="1"> 点评APP</label><label class="ci"><input type="checkbox" value="2"> 分销</label><label class="ci"><input type="checkbox" value="3" onchange="chCh(3,this)"> 美团小程序</label><label class="ci"><input type="checkbox" value="4"> 点评小程序</label></div><div class="cg" style="margin-top:8px;padding-left:16px"><label class="ci" id="ch5w" style="opacity:.5"><input type="checkbox" value="5" disabled id="ch5"> 真便宜(美团APP)</label><label class="ci" id="ch6w" style="opacity:.5"><input type="checkbox" value="6" disabled id="ch6"> 真便宜(美团小程序)</label></div></div></div>
+<div class="fi"><label class="lbl">是否钟点房</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox" checked> 全日房</label><label class="ci"><input type="checkbox"> 钟点房</label></div></div></div>
+<div class="fi"><label class="lbl">是否闲置房</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox"> 闲置房</label><label class="ci"><input type="checkbox" checked> 非闲置房</label></div></div></div>
+<div id="sd-domestic-fields">
+<div class="fi"><label class="lbl">是否代理</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox" checked> 自采</label><label class="ci"><input type="checkbox"> 代理</label></div></div></div>
+<div class="fi"><label class="lbl">付款方式</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox" checked> 预付</label><label class="ci"><input type="checkbox"> 现付</label></div></div></div>
+<div class="fi"><label class="lbl">供给类型</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox" checked> 不限</label><label class="ci"><input type="checkbox"> 超级团购</label><label class="ci"><input type="checkbox"> 附近好房</label></div></div></div>
+<div class="fi"><label class="lbl">上单方式</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox" checked> 预付</label><label class="ci"><input type="checkbox"> 直连</label></div></div></div>
+<div class="fi"><label class="lbl">价格更新方式</label><div class="ctl"><div class="cg"><label class="ci"><input type="checkbox" checked> 落地</label><label class="ci"><input type="checkbox"> 非落地</label></div></div></div>
+</div>
 
-    <button id="backToTop" class="btn" aria-label="返回顶部">返回顶部</button>
+<!-- 标签体系（标签组） -->
+<div class="sec-title"><span>标签配置</span></div>
+<p style="font-size:12px;color:#666;margin:-4px 0 12px">四类策略各自拥有全量标签，标签按分类组织。可创建多个标签组（标签组之间互不影响、无关系），每个标签组内可配置 N 个标签，组内标签之间可选择「且」或「或」关系。标签从带搜索框的分层选择框中选取，支持关键词全局搜索。分层序号_标签序号 以 x_x 标识。</p>
+<div id="sd-tag-groups"></div>
+<button class="btn btn-d" style="margin-top:4px" onclick="addTagGroup()">+ 添加标签组</button>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 主题
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') document.body.classList.add('dark');
-            const themeToggle = document.getElementById('themeToggle');
-            themeToggle.addEventListener('click', function() {
-                document.body.classList.toggle('dark');
-                const mode = document.body.classList.contains('dark') ? 'dark' : 'light';
-                localStorage.setItem('theme', mode);
-                themeToggle.textContent = mode === 'dark' ? '切换为亮色' : '切换主题';
-            });
-            themeToggle.textContent = document.body.classList.contains('dark') ? '切换为亮色' : '切换主题';
+<!-- 定价调整 -->
+<div class="sec-title"><span>定价调整</span><span class="refresh" onclick="alert('基于标签组配置重新生成表格行')">🔄 刷新</span></div>
+<div id="sd-pricing-hint" style="display:none;background:#e6f7ff;border:1px solid #91d5ff;border-radius:4px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#096dd9">请先选择策略类型，定价调整区域将根据策略类型动态显示</div>
 
-            // 返回顶部
-            const backToTop = document.getElementById('backToTop');
-            window.addEventListener('scroll', function() {
-                backToTop.classList.toggle('show', window.scrollY > 300);
-            });
-            backToTop.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+<!-- 基础定价配置区 -->
+<div id="sd-cfg-base-pricing" class="sd-cfg-panel" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:12px">基础定价：仅展示供需策略-调整动作，支持佣金率相对调整与绝对值调整（可上调/下调）</p>
+<table class="adj-tbl">
+<thead><tr><th>分层序号</th><th>分层名称</th><th>供需策略-调整动作</th></tr></thead>
+<tbody>
+<tr><td>1_1</td><td>默认分组</td><td><div class="comm-ctrl"><select onchange="supplyActionChange(this)"><option value="0">佣金率绝对值调整到</option><option value="1">佣金率相对调整</option></select><select style="width:60px;display:none" class="supply-dir"><option value="0">下调</option><option value="1">上调</option></select><input type="number" placeholder="0" style="width:55px"><span class="supply-unit">%</span></div></td></tr>
+</tbody>
+</table>
+</div>
 
-            // 星空动画
-            const canvas = document.getElementById('starfield');
-            const ctx = canvas.getContext('2d');
-            let stars = []; let width = 0, height = 0, dpr = Math.max(1, window.devicePixelRatio || 1);
-            function resize(){ width=innerWidth; height=innerHeight; canvas.style.width = width+'px'; canvas.style.height = height+'px'; canvas.width = Math.floor(width*dpr); canvas.height = Math.floor(height*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); initStars(); }
-            function initStars(){ const density = Math.max(60, Math.floor((width*height)/15000)); stars = new Array(density).fill(0).map(()=>({ x:Math.random()*width, y:Math.random()*height, r:Math.random()*1.4+0.2, sx:(Math.random()*2-1)*(0.05+Math.random()*0.25), sy:(Math.random()*2-1)*(0.05+Math.random()*0.25), p:Math.random()*Math.PI*2, sp:0.01+Math.random()*0.02 })); }
-            function step(){ ctx.clearRect(0,0,width,height); const dark=document.body.classList.contains('dark'); const col= dark?'rgba(255,255,255,':'rgba(255,255,240,'; for(const s of stars){ s.x+=s.sx; s.y+=s.sy; if(s.x<-5)s.x=width+5; if(s.x>width+5)s.x=-5; if(s.y<-5)s.y=height+5; if(s.y>height+5)s.y=-5; s.p+=s.sp; const a=0.4+0.6*Math.abs(Math.sin(s.p)); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle = col + a + ')'; ctx.shadowBlur=8; ctx.shadowColor = dark?'rgba(255,255,255,0.6)':'rgba(255,255,200,0.5)'; ctx.fill(); } ctx.shadowBlur=0; requestAnimationFrame(step); }
-            addEventListener('resize', resize); resize(); requestAnimationFrame(step);
-        });
+<!-- 叠加定价配置区 -->
+<div id="sd-cfg-overlay-pricing" class="sd-cfg-panel" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:12px">叠加定价：仅展示供需策略-调整动作，去掉"佣金率绝对值调整"，仅保留佣金率相对调整。叠加涨幅仅在基础定价结果上生效</p>
+<table class="adj-tbl">
+<thead><tr><th>分层序号</th><th>分层名称</th><th>供需策略-调整动作</th></tr></thead>
+<tbody>
+<tr><td>1_1</td><td>默认分组</td><td><div class="comm-ctrl"><select style="width:120px" disabled><option value="1">佣金率相对调整</option></select><select style="width:60px"><option value="1">上调</option><option value="0">下调</option></select><input type="number" placeholder="0" style="width:70px" step="0.01"><span style="font-size:12px;margin-left:4px">pp</span></div></td></tr>
+</tbody>
+</table>
+</div>
 
-        // 入场动画
-        const style = document.createElement('style');
-        style.textContent = `@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} .hero{animation:fadeInUp .6s ease both}`;
-        document.head.appendChild(style);
-    </script>
+<!-- 模型定价配置区 -->
+<div id="sd-cfg-model-pricing" class="sd-cfg-panel" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:12px">模型定价：仅展示模型调价范围（佣金率相对阈值 pp / 佣金率绝对阈值 %）</p>
+<table class="adj-tbl">
+<thead><tr><th>分层序号</th><th>分层名称</th><th>模型调价范围</th></tr></thead>
+<tbody>
+<tr><td>1_1</td><td>默认分组</td><td><div class="comm-ctrl"><select style="width:140px" onchange="modelRangeUnitChange(this)"><option value="pp">佣金率相对阈值</option><option value="%">佣金率绝对阈值</option></select><span style="font-size:12px;margin-left:6px">Minimum:</span><input type="number" placeholder="0" style="width:55px"><span class="model-range-unit" style="font-size:12px;margin-left:4px">pp</span><span style="font-size:12px;margin-left:8px">Maximum:</span><input type="number" placeholder="0" style="width:55px"><span class="model-range-unit" style="font-size:12px;margin-left:4px">pp</span></div></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 基础补贴配置区 -->
+<div id="sd-cfg-base-subsidy" class="sd-cfg-panel" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:12px">基础补贴：直接配置平台补贴的兜底策略（无"点击配置"弹窗）</p>
+<table class="adj-tbl">
+<thead><tr><th>分层序号</th><th>分层名称</th><th>竞争策略-调整动作（平台补贴兜底策略）</th></tr></thead>
+<tbody>
+<tr><td>1_1</td><td>默认分组</td><td>
+<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+<span style="font-size:12px">每间夜按</span>
+<select style="width:160px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 6px"><option value="0">无差异化商促后价格</option></select>
+<span style="font-size:12px">×</span>
+<input type="number" value="0" placeholder="补贴率" style="width:70px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;text-align:center">
+<span style="font-size:12px">%</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+<span style="font-size:12px">兜底策略是否可超佣：</span>
+<div class="rg"><label class="ri"><input type="radio" name="sd-base-sub-over" value="1"> 是</label><label class="ri"><input type="radio" name="sd-base-sub-over" value="0" checked> 否</label></div>
+</div>
+</td></tr>
+</tbody>
+</table>
+<div style="background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;padding:10px;margin-top:10px"><p style="font-size:12px;color:#d48806">校验规则：补贴率% 必填，需为正数且最多两位小数；是否可超佣为必选项</p></div>
+</div>
+
+<!-- 叠加补贴配置区 -->
+<div id="sd-cfg-overlay-subsidy" class="sd-cfg-panel" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:12px">叠加补贴：选择倍率叠加（×N）或力度叠加（+pp）</p>
+<table class="adj-tbl">
+<thead><tr><th>分层序号</th><th>分层名称</th><th>叠加补贴方式</th><th>叠加补贴值</th></tr></thead>
+<tbody>
+<tr><td>1_1</td><td>默认分组</td><td><div class="rg"><label class="ri"><input type="radio" name="sd-overlay-sub-mode" value="multiply" checked onchange="sdOverlaySubModeChange()"> 倍率叠加（×N）</label><label class="ri"><input type="radio" name="sd-overlay-sub-mode" value="add" onchange="sdOverlaySubModeChange()"> 力度叠加（+pp）</label></div></td><td><div class="comm-ctrl"><span id="sd-overlay-sub-prefix">×</span><input type="number" placeholder="1.0" step="0.01" min="0" style="width:70px" id="sd-overlay-sub-input"><span id="sd-overlay-sub-suffix" style="font-size:12px;margin-left:4px"></span></div></td></tr>
+</tbody>
+</table>
+<div style="background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;padding:10px;margin-top:10px"><p style="font-size:12px;color:#d48806">校验规则：倍率叠加仅允许正数；力度叠加保持大于0且最多两位小数</p></div>
+</div>
+
+<!-- 竞争追价配置区 -->
+<div id="sd-cfg-comp-chase" class="sd-cfg-panel" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:12px">竞争追价：配置竞对追价规则</p>
+<table class="adj-tbl">
+<thead><tr><th>分层序号</th><th>分层名称</th><th>竞争策略-调整动作</th></tr></thead>
+<tbody>
+<tr><td>1_1</td><td>默认分组</td><td><div style="display:flex;align-items:center;gap:8px"><label class="ci"><input type="checkbox" onchange="this.closest('td').querySelector('.cfg-btn').disabled=!this.checked"> 是</label><button class="btn btn-d cfg-btn" disabled onclick="openM('m-comp')" style="font-size:12px;padding:3px 10px">点击配置</button></div></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 算法补贴配置区 -->
+<div id="sd-cfg-algo-subsidy" class="sd-cfg-panel" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:12px">算法补贴：选择补贴模型并配置竞争追价</p>
+<table class="adj-tbl">
+<thead><tr><th>分层序号</th><th>分层名称</th><th>竞争策略-调整动作</th></tr></thead>
+<tbody>
+<tr><td>1_1</td><td>默认分组</td><td><div style="display:flex;align-items:center;gap:8px"><label class="ci"><input type="checkbox" onchange="this.closest('td').querySelector('.cfg-btn').disabled=!this.checked"> 是</label><button class="btn btn-d cfg-btn" disabled onclick="openM('m-comp')" style="font-size:12px;padding:3px 10px">点击配置</button></div></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="btn-center">
+<button class="btn btn-p" onclick="alert('新建模式：直接保存提交\n编辑模式：先弹出差异预览弹窗，确认后提交')">保存</button>
+<button class="btn btn-g" onclick="go('strategy-list')">返回</button>
+</div>
+</div>
+</div>
+
+<!-- ======================= 活动列表 ======================= -->
+<div class="page" id="p-activity-list">
+<div class="card">
+<div class="search-grid">
+<div class="field"><label>定价活动ID</label><input type="text" placeholder="支持多ID，逗号分隔"></div>
+<div class="field"><label>定价活动名称</label><input type="text" placeholder="请输入活动名称"></div>
+<div class="field"><label>活动类型</label><select><option value="">全部</option><option value="base-pricing">基础定价</option><option value="overlay-pricing">叠加定价</option><option value="model-pricing">模型定价</option><option value="base-subsidy">基础补贴</option><option value="overlay-subsidy">叠加补贴</option><option value="comp-chase">竞争追价</option><option value="algo-subsidy">算法补贴</option></select></div>
+<div class="field"><label>创建人</label><input type="text" placeholder="请输入创建人"></div>
+<div class="field"><label>状态</label><select><option value="">全部</option><option value="0">草稿</option><option value="1">已上线</option><option value="2">已下线</option><option value="6">审批中</option></select></div>
+<div class="field"><label>酒店选单ID</label><input type="number" placeholder="棱镜圈选规则ID"></div>
+<div class="field"><label>创建方式</label><select><option value="">全部</option><option value="0">条件筛选</option><option value="1">名单导入</option></select></div>
+<div class="field"><label>优先级范围</label><div class="range"><input type="number" placeholder="最小"><span>~</span><input type="number" placeholder="最大"></div></div>
+<div class="field"><label>时间范围</label><div class="range"><input type="date"><span>~</span><input type="date"></div></div>
+<div class="field"><label>业务线</label><select id="al-biz" onchange="alBizChange()"><option value="">请选择</option><option value="1">国内</option><option value="2">境外</option></select></div>
+<div class="field"><label>业务类型</label><select id="al-scene"><option value="">请先选择业务线</option></select></div>
+<div class="field" id="al-goods" style="display:none"><label>goodsId</label><input type="text" placeholder="仅境外可用"></div>
+<div class="field" id="al-poi" style="display:none"><label>poiId</label><input type="text" placeholder="仅境外可用"></div>
+</div>
+<div class="actions">
+<button class="btn btn-p">查询</button>
+<button class="btn btn-d">重置</button>
+<button class="btn btn-p" onclick="go('activity-create')">+ 新建</button>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><span class="card-title">活动列表</span><button class="btn btn-d" disabled id="batch-delay-btn" onclick="openM('m-delay')">批量延期</button></div>
+<div class="tbl-wrap">
+<table class="tbl">
+<thead><tr><th><input type="checkbox"></th><th>活动ID</th><th>活动名称</th><th>活动类型</th><th>优先级</th><th>策略ID</th><th>酒店选单ID</th><th>创建方式</th><th>生效时间范围</th><th>创建人</th><th>最近修改人</th><th>最近修改时间</th><th>状态</th><th>业务线</th><th>业务类型</th><th style="min-width:350px">操作</th></tr></thead>
+<tbody>
+<tr><td><input type="checkbox"></td><td>20001</td><td>国内收益竞争活动A</td><td><span class="tag tag-green">基础定价</span></td><td>100</td><td>10234</td><td>R-5501</td><td>条件筛选</td><td>2024-06-01 ~ 2024-12-31</td><td>zhangsan</td><td>lisi</td><td>2024-06-10 15:30</td><td><span class="tag tag-green">已上线</span></td><td>国内</td><td>收益</td><td><button class="btn-link" onclick="go('activity-view')">查看</button><button class="btn-link">生效数据</button><button class="btn-link" onclick="go('activity-edit')">编辑</button><button class="btn-link red" onclick="confirm('确认下线该活动?')">下线</button><button class="btn-link" onclick="go('activity-copy')">复制</button><button class="btn-link" onclick="openM('m-alog')">日志</button><button class="btn-link" onclick="openM('m-delay')">延期</button></td></tr>
+<tr><td><input type="checkbox" disabled></td><td>20002</td><td>境外分销供需活动B</td><td><span class="tag tag-orange">叠加定价</span></td><td>50</td><td>10236</td><td>R-5502</td><td>名单导入</td><td>2024-07-01 ~ 2024-09-30</td><td>wangwu</td><td>wangwu</td><td>2024-07-05 09:20</td><td><span class="tag tag-gray">草稿</span></td><td>境外</td><td>分销</td><td><button class="btn-link" onclick="go('activity-view')">查看</button><button class="btn-link">生效数据</button><button class="btn-link" onclick="go('activity-edit')">编辑</button><button class="btn-link" onclick="confirm('确认上线?')">上线</button><button class="btn-link" onclick="go('activity-copy')">复制</button><button class="btn-link" onclick="openM('m-alog')">日志</button></td></tr>
+<tr><td><input type="checkbox" disabled></td><td>20003</td><td>规模包房综合活动C</td><td><span class="tag tag-green">基础补贴</span></td><td>80</td><td>10235</td><td>R-5503</td><td>条件筛选</td><td>2024-05-01 ~ 2024-08-31</td><td>zhaoliu</td><td>zhaoliu</td><td>2024-06-20 11:00</td><td><span class="tag tag-red">已下线</span></td><td>国内</td><td>包房</td><td><button class="btn-link" onclick="go('activity-view')">查看</button><button class="btn-link">生效数据</button><button class="btn-link" onclick="go('activity-copy')">复制</button><button class="btn-link" onclick="openM('m-alog')">日志</button><button class="btn-link">下载分流</button><button class="btn-link">下载过滤</button></td></tr>
+<tr><td><input type="checkbox" disabled></td><td>20004</td><td>特殊供给审批活动D</td><td><span class="tag tag-orange">叠加补贴</span></td><td>60</td><td>10234</td><td>R-5504</td><td>条件筛选</td><td>2024-08-01 ~ 2025-01-31</td><td>sunqi</td><td>sunqi</td><td>2024-07-25 16:45</td><td><span class="tag tag-orange">审批中</span></td><td>国内</td><td>特殊供给</td><td><button class="btn-link" onclick="go('activity-view')">查看</button><button class="btn-link">生效数据</button><button class="btn-link" onclick="alert('审核通过/驳回')">审核</button><button class="btn-link" onclick="go('activity-copy')">复制</button><button class="btn-link" onclick="openM('m-alog')">日志</button></td></tr>
+</tbody>
+</table>
+</div>
+<div class="pager"><span class="pager-info">共 4 条</span><button class="btn btn-d" style="padding:3px 8px;font-size:12px" disabled>&lt;</button><button class="btn btn-p" style="padding:3px 8px;font-size:12px">1</button><button class="btn btn-d" style="padding:3px 8px;font-size:12px" disabled>&gt;</button></div>
+</div>
+</div>
+
+<!-- ======================= 活动详情（新建/编辑/查看/复制） ======================= -->
+<div class="page" id="p-activity-detail">
+<div class="detail-card">
+<!-- 基础信息 -->
+<div class="sec-title" style="margin-top:0"><span>基础信息</span></div>
+<div class="fi"><label class="lbl req">定价活动名称</label><div class="ctl"><input type="text" placeholder="请输入，最多40字" maxlength="40"></div></div>
+<div class="fi"><label class="lbl req">定价活动描述</label><div class="ctl"><textarea rows="3" placeholder="请输入，最多150字" maxlength="150"></textarea></div></div>
+<div class="fi"><label class="lbl req">活动类型</label><div class="ctl"><select id="ad-type" style="width:260px"><option value="">请选择</option><option value="base-pricing">基础定价</option><option value="overlay-pricing">叠加定价</option><option value="model-pricing">模型定价</option><option value="base-subsidy">基础补贴</option><option value="overlay-subsidy">叠加补贴</option><option value="comp-chase">竞争追价</option><option value="algo-subsidy">算法补贴</option></select><div class="hint">活动类型决定了该活动可关联的策略类型范围（选择某类型后，关联策略仅可查询同类型策略）</div></div></div>
+<div class="fi"><label class="lbl req">业务线</label><div class="ctl"><select id="ad-biz" onchange="adBizChange()"><option value="">请选择</option><option value="1">国内</option><option value="2">境外</option></select></div></div>
+<div class="fi"><label class="lbl req">业务类型</label><div class="ctl"><select id="ad-scene"><option value="">请先选择业务线</option></select></div></div>
+<div class="fi"><label class="lbl req">生效时间范围</label><div class="ctl"><div style="display:flex;align-items:center;gap:8px"><input type="datetime-local" style="width:200px;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:13px"><span>至</span><input type="datetime-local" style="width:200px;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:13px"></div></div></div>
+<div class="fi"><label class="lbl">是否开启到期提醒</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-remind" value="1" onchange="document.getElementById('ad-reporter').style.display=''"> 是</label><label class="ri"><input type="radio" name="ad-remind" value="0" checked onchange="document.getElementById('ad-reporter').style.display='none'"> 否</label></div></div></div>
+<div class="fi" id="ad-reporter" style="display:none"><label class="lbl req">到期提醒人</label><div class="ctl"><input type="text" placeholder="mis号，最多3人，英文逗号分隔"><div class="hint">例：zhangsan,lisi,wangwu</div></div></div>
+
+<!-- 规则信息 -->
+<div class="sec-title"><span>规则信息</span></div>
+<div class="fi"><label class="lbl req">优先级</label><div class="ctl"><input type="number" style="width:120px" placeholder="1~999" min="1" max="999"><div class="hint">数值越大优先级越高，范围由业务类型决定</div></div></div>
+<div class="fi"><label class="lbl req">创建方式</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-way" value="0" checked onchange="adWayChange()"> 条件筛选</label><label class="ri"><input type="radio" name="ad-way" value="1" onchange="adWayChange()"> 名单导入</label></div></div></div>
+
+<!-- 条件筛选模式 -->
+<div id="ad-filter-mode">
+<div class="fi"><label class="lbl req">规则维度</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-dim" value="POI_ID" checked> POI维度</label><label class="ri"><input type="radio" name="ad-dim" value="GOODS_ID"> GOODS维度</label></div></div></div>
+<div class="fi"><label class="lbl req">执行方式</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-task" value="0" checked> 立即执行</label><label class="ri"><input type="radio" name="ad-task" value="1"> 定时执行</label></div></div></div>
+<div class="fi"><label class="lbl req">棱镜规则ID</label><div class="ctl"><select style="width:300px"><option value="">搜索或选择棱镜圈选规则</option><option>R-5501 (国内收益规则)</option><option>R-5502 (境外分销规则)</option><option>R-5503 (包房规则)</option></select><div class="hint">编辑模式下不可修改</div></div></div>
+</div>
+
+<!-- 名单导入模式 -->
+<div id="ad-import-mode" style="display:none">
+<div class="fi"><label class="lbl req">导入类型</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-listtype" value="1" checked> GOODS上传</label><label class="ri"><input type="radio" name="ad-listtype" value="2"> POIID上传</label></div></div></div>
+<div class="fi"><label class="lbl req">上传文件</label><div class="ctl"><div class="upload-box"><p style="color:#1890ff">📁 点击上传 或 拖拽文件到此处</p><p class="hint" style="margin-top:8px">仅支持 .xls / .xlsx 格式</p></div></div></div>
+</div>
+
+<div class="fi"><label class="lbl">活动黑名单</label><div class="ctl"><select multiple style="width:300px;height:64px"><option>黑名单A (ID: 1001)</option><option>黑名单B (ID: 1002)</option><option>黑名单C (ID: 1003)</option></select><div class="hint">可多选</div></div></div>
+
+<!-- 策略信息 -->
+<div class="sec-title"><span>策略信息</span></div>
+<div class="fi"><label class="lbl req">是否AB实验</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-ab" value="1" onchange="adAbChange()"> 是</label><label class="ri"><input type="radio" name="ad-ab" value="0" checked onchange="adAbChange()"> 否</label></div></div></div>
+
+<!-- 非AB实验：直接关联策略 -->
+<div id="ad-no-ab">
+<div class="fi"><label class="lbl req">关联策略ID</label><div class="ctl"><select style="width:300px"><option value="">搜索或选择策略</option><option>10234 - 境内收益竞争策略A</option><option>10235 - 境内规模供需策略B</option><option>10236 - 境外分销综合策略</option></select></div></div>
+</div>
+
+<!-- AB实验配置 -->
+<div id="ad-ab-cfg" style="display:none">
+<div class="fi"><label class="lbl req">实验维度</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-expdim" value="0" checked> POI维度</label><label class="ri"><input type="radio" name="ad-expdim" value="1"> 时间维度</label><label class="ri"><input type="radio" name="ad-expdim" value="2"> 用户维度</label></div></div></div>
+<div class="ab-cfg">
+<h4 style="margin-bottom:12px;font-size:13px;color:#333">实验分组配置</h4>
+<div class="ab-grp"><span style="font-weight:500;min-width:60px">实验组A</span><label style="font-size:12px;color:#666">关联策略：</label><select style="height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 8px;width:200px"><option>10234 - 境内收益竞争策略A</option></select><label style="font-size:12px;color:#666;margin-left:12px">流量占比：</label><input type="number" style="height:28px;width:60px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;text-align:center" value="50"><span style="font-size:12px">%</span></div>
+<div class="ab-grp"><span style="font-weight:500;min-width:60px">对照组B</span><label style="font-size:12px;color:#666">关联策略：</label><select style="height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 8px;width:200px"><option>10235 - 境内规模供需策略B</option></select><label style="font-size:12px;color:#666;margin-left:12px">流量占比：</label><input type="number" style="height:28px;width:60px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;text-align:center" value="50"><span style="font-size:12px">%</span></div>
+<button class="btn btn-d" style="font-size:12px;margin-top:8px">+ 添加分组</button>
+</div>
+</div>
+
+<div class="fi" style="margin-top:16px"><label class="lbl">是否生效尾数定价</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="ad-tail" value="1"> 是</label><label class="ri"><input type="radio" name="ad-tail" value="0" checked> 否</label></div></div></div>
+
+<div class="btn-center">
+<button class="btn btn-p" onclick="alert('新建：直接提交保存\n编辑：先弹差异预览弹窗确认')">保存</button>
+<button class="btn btn-g" onclick="go('activity-list')">返回</button>
+</div>
+</div>
+</div>
+
+</div><!-- .body -->
+</main>
+</div>
+
+<!-- ==================== 弹窗：策略日志 ==================== -->
+<div class="overlay" id="m-slog">
+<div class="modal modal-md">
+<div class="modal-hd"><h3>策略操作日志</h3><button class="modal-x" onclick="closeM('m-slog')">✕</button></div>
+<div class="modal-bd">
+<table class="tbl" style="width:100%">
+<thead><tr><th>编号</th><th>策略ID</th><th>修改内容</th><th>修改人</th><th>修改时间</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>10234</td><td>修改竞争策略配置</td><td>lisi</td><td>2024-06-01 14:22</td></tr>
+<tr><td>2</td><td>10234</td><td>新增酒店分层</td><td>zhangsan</td><td>2024-05-20 10:15</td></tr>
+<tr><td>3</td><td>10234</td><td>创建策略</td><td>zhangsan</td><td>2024-03-15 10:30</td></tr>
+</tbody>
+</table>
+</div>
+<div class="modal-ft"><button class="btn btn-d" onclick="closeM('m-slog')">关闭</button></div>
+</div>
+</div>
+
+<!-- ==================== 弹窗：活动日志 ==================== -->
+<div class="overlay" id="m-alog">
+<div class="modal modal-md">
+<div class="modal-hd"><h3>活动操作日志</h3><button class="modal-x" onclick="closeM('m-alog')">✕</button></div>
+<div class="modal-bd">
+<table class="tbl" style="width:100%">
+<thead><tr><th>编号</th><th>活动ID</th><th>修改内容</th><th>修改人</th><th>修改时间</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>20001</td><td>修改生效时间</td><td>lisi</td><td>2024-06-10 15:30</td></tr>
+<tr><td>2</td><td>20001</td><td>上线活动</td><td>zhangsan</td><td>2024-06-01 09:00</td></tr>
+<tr><td>3</td><td>20001</td><td>创建活动</td><td>zhangsan</td><td>2024-05-25 14:00</td></tr>
+</tbody>
+</table>
+</div>
+<div class="modal-ft"><button class="btn btn-d" onclick="closeM('m-alog')">关闭</button></div>
+</div>
+</div>
+
+<!-- ==================== 弹窗：批量延期 ==================== -->
+<div class="overlay" id="m-delay">
+<div class="modal modal-sm">
+<div class="modal-hd"><h3>活动延期</h3><button class="modal-x" onclick="closeM('m-delay')">✕</button></div>
+<div class="modal-bd">
+<div class="fi"><label class="lbl req">延期方式</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="delay-type" value="0" checked onchange="document.getElementById('delay-date').style.display='';document.getElementById('delay-days').style.display='none'"> 固定日期</label><label class="ri"><input type="radio" name="delay-type" value="1" onchange="document.getElementById('delay-date').style.display='none';document.getElementById('delay-days').style.display=''"> 延长天数</label></div></div></div>
+<div class="fi" id="delay-date"><label class="lbl req">结束日期</label><div class="ctl"><input type="datetime-local" style="width:240px;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:13px"></div></div>
+<div class="fi" id="delay-days" style="display:none"><label class="lbl req">延长天数</label><div class="ctl"><input type="number" style="width:120px" placeholder="天数" min="1"> <span style="font-size:13px;color:#666">天</span></div></div>
+<div style="background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;padding:12px;margin-top:16px">
+<p style="font-size:12px;color:#d48806;font-weight:500">延期确认信息</p>
+<p style="font-size:12px;color:#666;margin-top:6px">活动ID: 20001 | 活动名称: 国内收益竞争活动A</p>
+<p style="font-size:12px;color:#666">原结束日期: 2024-12-31 → 新结束日期: 待设置</p>
+</div>
+</div>
+<div class="modal-ft"><button class="btn btn-d" onclick="closeM('m-delay')">取消</button><button class="btn btn-p" onclick="alert('延期成功');closeM('m-delay')">确定</button></div>
+</div>
+</div>
+
+<!-- ==================== 弹窗：竞争策略规则配置 ==================== -->
+<div class="overlay" id="m-comp">
+<div class="modal" style="width:80%;max-width:1200px">
+<div class="modal-hd"><h3>竞争策略规则配置</h3><button class="modal-x" onclick="closeM('m-comp')">&#10005;</button></div>
+<div class="modal-bd" style="max-height:70vh;overflow-y:auto">
+
+<!-- 竞争策略类型选择 -->
+<div class="fi"><label class="lbl req" style="width:160px">竞争策略类型</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="comp-type" value="3" checked onchange="compTypeChange()"> 竞对追价(新)</label><label class="ri"><input type="radio" name="comp-type" value="2" disabled onchange="compTypeChange()"> 锚点价追价</label><label class="ri"><input type="radio" name="comp-type" value="4" onchange="compTypeChange()"> MT同SKU追价</label></div></div></div>
+
+<!-- 竞争补贴是否可超佣（仅竞对追价新显示） -->
+<div class="fi" id="comp-super-row"><label class="lbl" style="width:160px">竞争补贴是否可超佣</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="comp-super" value="1"> 是</label><label class="ri"><input type="radio" name="comp-super" value="0" checked> 否</label></div></div></div>
+
+<!-- ========= 竞对追价(新) strategyType=3 ========= -->
+<div id="comp-bidding">
+<div style="border:1px solid #e8e8e8;border-radius:4px;padding:16px;margin-bottom:12px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h4 style="margin:0;font-size:14px;font-weight:500">竞对追价规则</h4></div>
+
+<!-- 规则配置卡片 #1 -->
+<div class="comp-card" style="position:relative">
+<div class="comp-row"><label style="width:160px">竞争对手：</label><div class="cg" style="flex:1;flex-wrap:wrap"><label class="ci"><input type="checkbox" onchange="compAllSelect(this)"> 全选</label><label class="ci"><input type="checkbox"> CT(携程)</label><label class="ci"><input type="checkbox"> QN(去哪儿)</label><label class="ci"><input type="checkbox"> EL(艺龙)</label><label class="ci"><input type="checkbox"> FZ(飞猪)</label><label class="ci"><input type="checkbox"> JD(京东)</label><label class="ci"><input type="checkbox"> DY(抖音)</label><label class="ci"><input type="checkbox"> ZX(智行)</label><label class="ci"><input type="checkbox"> HZ(华住)</label><label class="ci"><input type="checkbox"> JJ(锦江)</label><label class="ci"><input type="checkbox"> RJ(如家)</label><label class="ci"><input type="checkbox"> Booking</label></div></div>
+<div class="comp-row"><label style="width:160px">价格层级：</label><div class="cg"><label class="ci"><input type="checkbox" value="0" onchange="compPriceLevelChange()"> MT实价</label><label class="ci"><input type="checkbox" value="1" onchange="compPriceLevelChange()"> 目标com供应链价</label><label class="ci"><input type="checkbox" value="2" onchange="compPriceLevelChange()"> 目标com商促后卖价</label><label class="ci"><input type="checkbox" value="3" onchange="compPriceLevelChange()"> 目标com原价</label></div></div>
+
+<!-- 调整平台补贴控价（priceLevel含0时显示） -->
+<div id="comp-subsidy-section" style="display:none;margin:10px 0;padding:12px;border:1px solid #e8e8e8;border-radius:4px;background:#fff">
+<p style="font-size:13px;font-weight:500;margin-bottom:10px">调整平台补贴控价</p>
+<div style="border-bottom:1px solid #f0f0f0;margin-bottom:10px;padding-bottom:4px"><span style="font-size:12px;cursor:pointer;padding:4px 12px;border-bottom:2px solid #1890ff;color:#1890ff">默认</span><span style="font-size:12px;cursor:not-allowed;padding:4px 12px;color:#ccc;margin-left:8px" title="自定义（二期）">自定义</span></div>
+<div class="comp-row"><label style="width:160px">追价目标价：</label><div class="ig"><select style="width:60px"><option value="1">max</option><option value="2">min</option></select><span style="font-size:12px;color:#666;margin-left:8px">（竞对目标价，供应链底价 / (1 - 原始佣金率) + X）</span></div></div>
+<div class="comp-row"><label style="width:160px">竞对目标价：</label><div class="ig"><select style="width:200px"><option value="1">会员实价</option><option value="2">非会员实价</option><option value="4">优先含会员实价其次非会员实价</option><option value="5">优先非会员实价其次含会员实价</option></select><span style="margin:0 4px">&times;</span><input type="number" value="1.00" step="0.01" style="width:70px"><select style="width:40px"><option value="0">+</option><option value="1">-</option></select><input type="number" value="0" step="0.001" style="width:60px"><span style="font-size:12px;margin-left:4px">元</span></div></div>
+<div class="comp-row"><label style="width:160px">原始佣金率：</label><div class="ig"><select style="width:140px" onchange="compCommActionChange(this)"><option value="0">佣金率绝对值调整到</option><option value="1">佣金率相对调整</option></select><select style="width:50px;display:none" class="comp-comm-dir"><option>下调</option><option>上调</option></select><input type="number" value="0" style="width:60px"><span style="font-size:12px" class="comp-comm-unit">%</span></div></div>
+<div class="comp-row"><label style="width:160px">调整值X：</label><input type="number" value="0" step="0.01" min="-10" max="10" style="width:80px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;text-align:center"></div>
+</div>
+
+<!-- 调整佣金率控价（priceLevel含非0时显示） -->
+<div id="comp-commission-section" style="display:none;margin:10px 0;padding:12px;border:1px solid #e8e8e8;border-radius:4px;background:#fff">
+<p style="font-size:13px;font-weight:500;margin-bottom:10px">调整佣金率控价</p>
+<div class="comp-row"><label style="width:160px">追价目标价：</label><span style="font-size:12px;color:#666">max ( MT调后原价, MT底价 / ( 1 - 佣金率 ) + X )</span></div>
+<div class="comp-row"><label style="width:160px">MT调后原价：</label><div class="ig"><select style="width:60px"><option value="1">max</option><option value="2">min</option></select><span style="font-size:12px;color:#666;margin-left:8px">（基于各层COM价计算的MT调后价）</span></div></div>
+<div id="comp-com-price-rows"></div>
+<div class="comp-row"><label style="width:160px">原始佣金率：</label><div class="ig"><select style="width:140px" onchange="compCommActionChange(this)"><option value="0">佣金率绝对值调整到</option><option value="1">佣金率相对调整</option></select><select style="width:50px;display:none" class="comp-comm-dir"><option>下调</option><option>上调</option></select><input type="number" value="0" style="width:60px"><span style="font-size:12px" class="comp-comm-unit">%</span></div></div>
+<div class="comp-row"><label style="width:160px">调整值X：</label><input type="number" value="0" step="0.01" min="-10" max="10" style="width:80px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;text-align:center"></div>
+</div>
+
+<div class="comp-row"><label style="width:160px">失效时间：</label><div class="ig"><span style="font-size:12px;color:#666;margin-right:4px">获取最新采集结果后</span><input type="number" value="0" min="0" style="width:50px"><span style="font-size:12px">时</span><input type="number" value="0" min="0" style="width:50px"><span style="font-size:12px">分</span><input type="number" value="0" min="0" style="width:50px"><span style="font-size:12px">秒</span></div></div>
+<div style="position:absolute;right:14px;top:14px;display:flex;gap:6px"><button class="btn btn-d" style="font-size:11px;padding:2px 8px" onclick="alert('必须保留一条追价配置')">-</button></div>
+</div>
+
+<button class="btn btn-d" style="font-size:12px;margin-bottom:14px" onclick="alert('新增一条规则配置（竞争对手不可跨行重复）')">+ 新增规则</button>
+</div>
+
+<!-- 兜底策略区域 -->
+<div style="border-top:1px solid #e8e8e8;padding-top:14px">
+<div class="fi"><label class="lbl" style="width:220px">是否配置价格条件</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="comp-price" value="1" disabled onchange="document.getElementById('comp-price-cfg').style.display=''"> 是</label><label class="ri"><input type="radio" name="comp-price" value="0" checked disabled onchange="document.getElementById('comp-price-cfg').style.display='none'"> 否</label></div></div></div>
+<div id="comp-price-cfg" style="display:none;margin-left:16px">
+<div class="fi"><label class="lbl" style="width:160px">条件类型</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="comp-cond-type" value="1" disabled> 仅供给价格条件</label><label class="ri"><input type="radio" name="comp-cond-type" value="2" disabled> 仅实价价格条件</label><label class="ri"><input type="radio" name="comp-cond-type" value="3" disabled> 供给&amp;实价价格条件</label></div></div></div>
+<p style="font-size:12px;color:#999;margin:4px 0 4px 160px">条件表达式配置（当前disabled，待开放）</p>
+</div>
+
+<div class="fi"><label class="lbl" style="width:220px">是否配置佣金率控价兜底策略</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="comp-cover" value="1" onchange="document.getElementById('comp-cover-cfg').style.display=''"> 是</label><label class="ri"><input type="radio" name="comp-cover" value="0" checked onchange="document.getElementById('comp-cover-cfg').style.display='none'"> 否</label></div></div></div>
+<div id="comp-cover-cfg" style="display:none;margin-left:16px"><div class="comp-row"><label style="width:160px">佣金率：</label><div class="ig"><select style="width:140px" onchange="compCommActionChange(this)"><option value="0">佣金率绝对值调整到</option><option value="1">佣金率相对调整</option></select><select style="width:50px;display:none" class="comp-comm-dir"><option>下调</option><option>上调</option></select><input type="number" value="0" style="width:60px"><span style="font-size:12px" class="comp-comm-unit">%</span></div></div></div>
+
+<div class="fi"><label class="lbl" style="width:220px">是否配置平台补贴的兜底策略</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="comp-target" value="1" onchange="document.getElementById('comp-target-cfg').style.display=''"> 是</label><label class="ri"><input type="radio" name="comp-target" value="0" checked onchange="document.getElementById('comp-target-cfg').style.display='none'"> 否</label></div></div></div>
+<div id="comp-target-cfg" style="display:none;margin-left:16px">
+<div class="comp-row"><label style="width:160px">每间夜按：</label><div class="ig"><select style="width:180px"><option value="0">无差异化商促后价格</option></select><input type="number" value="0" style="width:60px"><span style="font-size:12px">%</span></div></div>
+<div class="fi" style="margin-left:0"><label class="lbl" style="width:160px">兜底策略是否可超佣</label><div class="ctl"><div class="rg"><label class="ri"><input type="radio" name="comp-cover-super" value="1"> 是</label><label class="ri"><input type="radio" name="comp-cover-super" value="0" checked> 否</label></div></div></div>
+</div>
+</div>
+</div>
+
+<!-- ========= 锚点价追价 strategyType=2 ========= -->
+<div id="comp-anchor" style="display:none">
+<div style="border:1px solid #e8e8e8;border-radius:4px;padding:16px;background:#fafafa">
+<h4 style="margin:0 0 12px;font-size:14px;font-weight:500">锚点价追价配置</h4>
+<div class="comp-row"><label style="width:160px">价格层级：</label><div class="cg"><label class="ci"><input type="checkbox" checked disabled> MT实价</label></div></div>
+<div style="margin:10px 0;padding:12px;border:1px solid #e8e8e8;border-radius:4px;background:#fff">
+<p style="font-size:13px;font-weight:500;margin-bottom:10px">调整平台补贴控价</p>
+<div style="border-bottom:1px solid #f0f0f0;margin-bottom:10px;padding-bottom:4px"><span style="font-size:12px;padding:4px 12px;border-bottom:2px solid #1890ff;color:#1890ff">默认</span><span style="font-size:12px;cursor:not-allowed;padding:4px 12px;color:#ccc;margin-left:8px" title="自定义（二期）">自定义</span></div>
+<div class="comp-row"><label style="width:160px">追价目标价：</label><div class="ig"><select style="width:60px"><option value="1">max</option></select><span style="font-size:12px;color:#666;margin-left:8px">（目标锚点实价，MT供应链低价 / (1 - 佣金率) + X）</span></div></div>
+<div class="comp-row"><label style="width:160px">目标实价：</label><div class="ig"><select style="width:140px"><option value="3">目标锚点实价</option></select><span style="margin:0 4px">&times;</span><input type="number" value="1.00" step="0.01" style="width:70px"><select style="width:40px"><option value="0">+</option><option value="1">-</option></select><input type="number" value="0" step="0.001" style="width:60px"><span style="font-size:12px;margin-left:4px">元</span></div></div>
+<div class="comp-row"><label style="width:160px">佣金率：</label><div class="ig"><select style="width:140px" onchange="compCommActionChange(this)"><option value="0">佣金率绝对值调整到</option><option value="1">佣金率相对调整</option></select><select style="width:50px;display:none" class="comp-comm-dir"><option>下调</option><option>上调</option></select><input type="number" value="0" style="width:60px"><span style="font-size:12px" class="comp-comm-unit">%</span></div></div>
+<div class="comp-row"><label style="width:160px">调整值X：</label><input type="number" value="0" step="0.01" min="-10" max="10" style="width:80px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;text-align:center"></div>
+</div>
+</div>
+</div>
+
+<!-- ========= MT同SKU追价 strategyType=4 ========= -->
+<div id="comp-sku" style="display:none">
+<div style="border:1px solid #e8e8e8;border-radius:4px;padding:16px;background:#fafafa">
+<h4 style="margin:0 0 12px;font-size:14px;font-weight:500">MT同SKU追价配置</h4>
+<div class="comp-row"><label style="width:160px">补贴对象：</label><select style="height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 8px"><option value="1">直连闲置房产品</option></select></div>
+<div class="comp-row"><label style="width:160px">补贴策略：</label></div>
+<div style="margin-left:20px;background:#fff;border:1px solid #e8e8e8;border-radius:4px;padding:12px;margin-bottom:12px">
+<div class="comp-row"><label style="width:90px">限制价：</label><div class="ig"><select style="width:200px"><option value="1">直连闲置房供应链卖价</option></select><span style="font-size:12px;margin:0 4px">&times;</span><input type="number" value="1.00" step="0.01" min="0.5" max="1" placeholder="[0.5,1]" style="width:80px"></div></div>
+<div class="comp-row"><label style="width:90px">目标价格：</label><div class="ig"><select style="width:170px"><option value="6">SKU下最低实价</option><option value="7">SKU下自采最低实价</option></select><span style="margin:0 4px">&times;</span><input type="number" value="1.00" step="0.01" style="width:70px"><select style="width:40px"><option value="0">+</option><option value="1">-</option></select><input type="number" value="0" step="0.001" style="width:60px"><span style="font-size:12px">元</span></div></div>
+<div class="comp-row"><label style="width:90px">追价目标：</label><span style="font-size:12px;color:#666">max（目标价格，限制价）</span></div>
+<div class="comp-row"><label style="width:90px">补贴金额：</label><div class="ig"><select style="width:200px"><option value="1">直连闲置房供应链卖价</option></select><span style="font-size:12px;margin:0 4px"> - 追价目标</span></div></div>
+</div>
+<div class="comp-row"><label style="width:160px">失效时间：</label><div class="ig"><span style="font-size:12px;color:#666;margin-right:4px">获取最新采集结果后</span><input type="number" value="0" min="0" style="width:50px"><span style="font-size:12px">时</span><input type="number" value="0" min="0" style="width:50px"><span style="font-size:12px">分</span><input type="number" value="0" min="0" style="width:50px"><span style="font-size:12px">秒</span></div></div>
+</div>
+</div>
+
+</div>
+<div class="modal-ft" style="justify-content:center"><button class="btn btn-p" onclick="alert('竞争策略配置已保存');closeM('m-comp')">保存</button><button class="btn btn-d" onclick="closeM('m-comp')" style="margin-left:8px">取消</button></div>
+</div>
+</div>
+
+<!-- ==================== 弹窗：差异预览 ==================== -->
+<div class="overlay" id="m-diff">
+<div class="modal modal-lg">
+<div class="modal-hd"><h3>修改预览对比</h3><button class="modal-x" onclick="closeM('m-diff')">✕</button></div>
+<div class="modal-bd">
+<div class="diff-wrap">
+<div class="diff-new"><h4 style="color:#52c41a">修改后</h4><p style="color:#666;font-size:13px;margin-top:8px">变更字段将以绿色高亮显示</p><p style="font-size:12px;color:#999;margin-top:12px">基础信息变更...</p></div>
+<div class="diff-old"><h4 style="color:#f5222d">修改前</h4><p style="color:#666;font-size:13px;margin-top:8px">被修改字段将以红色高亮显示</p><p style="font-size:12px;color:#999;margin-top:12px">原始信息对照...</p></div>
+</div>
+</div>
+<div class="modal-ft"><button class="btn btn-d" onclick="closeM('m-diff')">取消</button><button class="btn btn-p" onclick="alert('提交成功，跳转回列表');closeM('m-diff')">确认提交</button></div>
+</div>
+</div>
+
+<script>
+// === 路由/页面切换 ===
+var pages = {
+  'strategy-list': {page:'p-strategy-list', nav:'nav-strategy', bc:'<a onclick="go(\'strategy-list\')">策略管理</a>'},
+  'strategy-create': {page:'p-strategy-detail', nav:'nav-strategy', bc:'<a onclick="go(\'strategy-list\')">策略管理</a><span class="sep">/</span>新增策略'},
+  'strategy-edit': {page:'p-strategy-detail', nav:'nav-strategy', bc:'<a onclick="go(\'strategy-list\')">策略管理</a><span class="sep">/</span>编辑策略'},
+  'strategy-view': {page:'p-strategy-detail', nav:'nav-strategy', bc:'<a onclick="go(\'strategy-list\')">策略管理</a><span class="sep">/</span>查看策略'},
+  'strategy-copy': {page:'p-strategy-detail', nav:'nav-strategy', bc:'<a onclick="go(\'strategy-list\')">策略管理</a><span class="sep">/</span>复制策略'},
+  'activity-list': {page:'p-activity-list', nav:'nav-activity', bc:'<a onclick="go(\'activity-list\')">定价活动管理</a>'},
+  'activity-create': {page:'p-activity-detail', nav:'nav-activity', bc:'<a onclick="go(\'activity-list\')">定价活动管理</a><span class="sep">/</span>新增活动'},
+  'activity-edit': {page:'p-activity-detail', nav:'nav-activity', bc:'<a onclick="go(\'activity-list\')">定价活动管理</a><span class="sep">/</span>编辑活动'},
+  'activity-view': {page:'p-activity-detail', nav:'nav-activity', bc:'<a onclick="go(\'activity-list\')">定价活动管理</a><span class="sep">/</span>查看活动'},
+  'activity-copy': {page:'p-activity-detail', nav:'nav-activity', bc:'<a onclick="go(\'activity-list\')">定价活动管理</a><span class="sep">/</span>复制活动'},
+};
+function go(key){
+  var cfg=pages[key]; if(!cfg) return;
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.getElementById(cfg.page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  document.getElementById(cfg.nav).classList.add('active');
+  document.getElementById('bc').innerHTML=cfg.bc;
+  // 进入策略详情页时，按当前选中的策略类型展示对应定价调整面板（默认基础定价），并初始化默认标签组
+  if(cfg.page==='p-strategy-detail'){ sdCatChange(); sdInitTagGroups(); }
+  window.scrollTo(0,0);
+}
+go('strategy-list');
+
+// === 弹窗 ===
+function openM(id){document.getElementById(id).classList.add('show')}
+function closeM(id){document.getElementById(id).classList.remove('show')}
+
+// === 业务线联动 ===
+function fillScene(sel,biz){
+  sel.innerHTML='';
+  if(biz==='1'){sel.innerHTML='<option value="1">收益</option><option value="3">分销</option><option value="4">包房</option><option value="5">规模</option><option value="6">特殊供给</option>'}
+  else if(biz==='2'){sel.innerHTML='<option value="1">收益</option><option value="3">分销</option>'}
+  else{sel.innerHTML='<option value="">请先选择业务线</option>'}
+}
+function slBizChange(){fillScene(document.getElementById('sl-scene'),document.getElementById('sl-biz').value)}
+function alBizChange(){
+  var v=document.getElementById('al-biz').value;
+  fillScene(document.getElementById('al-scene'),v);
+  document.getElementById('al-goods').style.display=v==='2'?'':'none';
+  document.getElementById('al-poi').style.display=v==='2'?'':'none';
+}
+function adBizChange(){fillScene(document.getElementById('ad-scene'),document.getElementById('ad-biz').value)}
+
+// === 策略类型联动：显示对应的定价调整区域 ===
+function sdCatChange(){
+  var v=document.querySelector('input[name="sd-cat"]:checked');
+  if(!v) return; v=v.value;
+  // 隐藏所有配置面板
+  document.querySelectorAll('.sd-cfg-panel').forEach(function(el){el.style.display='none'});
+  // 隐藏提示
+  document.getElementById('sd-pricing-hint').style.display='none';
+  // 模型类型行：仅模型定价显示
+  document.getElementById('sd-model-type-row').style.display=v==='model-pricing'?'':'none';
+  // 算法补贴模型行：仅算法补贴显示
+  document.getElementById('sd-algo-model-row').style.display=v==='algo-subsidy'?'':'none';
+  // 根据策略类型显示对应面板
+  var panelMap={
+    'base-pricing':'sd-cfg-base-pricing',
+    'overlay-pricing':'sd-cfg-overlay-pricing',
+    'model-pricing':'sd-cfg-model-pricing',
+    'base-subsidy':'sd-cfg-base-subsidy',
+    'overlay-subsidy':'sd-cfg-overlay-subsidy',
+    'comp-chase':'sd-cfg-comp-chase',
+    'algo-subsidy':'sd-cfg-algo-subsidy'
+  };
+  if(panelMap[v]){
+    document.getElementById(panelMap[v]).style.display='';
+  }
+  // 定实价显示联动
+  sdCheckRealPrice();
+}
+
+// === 定实价触发联动：基础定价 且 国内住宿(业务线=国内) 且 规模定价(业务类型=规模) ===
+function sdCheckRealPrice(){
+  var row=document.getElementById('sd-realprice-row');
+  if(!row) return;
+  var catEl=document.querySelector('input[name="sd-cat"]:checked');
+  var cat=catEl?catEl.value:'';
+  var biz=document.getElementById('sd-biz').value;
+  var scene=document.getElementById('sd-scene').value;
+  var show=(cat==='base-pricing' && biz==='1' && scene==='5');
+  row.style.display=show?'':'none';
+  if(!show){
+    // 隐藏时重置为"否"
+    var no=document.querySelector('input[name="sd-realprice"][value="0"]');
+    if(no) no.checked=true;
+  }
+}
+
+// === 叠加补贴模式切换 ===
+function sdOverlaySubModeChange(){
+  var v=document.querySelector('input[name="sd-overlay-sub-mode"]:checked').value;
+  var prefix=document.getElementById('sd-overlay-sub-prefix');
+  var input=document.getElementById('sd-overlay-sub-input');
+  var suffix=document.getElementById('sd-overlay-sub-suffix');
+  if(v==='multiply'){
+    prefix.textContent='×';
+    input.placeholder='1.0';
+    input.step='0.01';
+    suffix.textContent='';
+  } else {
+    prefix.textContent='+';
+    input.placeholder='0';
+    input.step='0.01';
+    suffix.textContent='pp';
+  }
+}
+
+// === 模型调价范围 单位切换（相对阈值 pp / 绝对阈值 %）===
+function modelRangeUnitChange(sel){
+  var unit=sel.value;
+  sel.closest('.comm-ctrl').querySelectorAll('.model-range-unit').forEach(function(el){el.textContent=unit;});
+}
+
+// === 业务线/业务类型 联动 ===
+function sdBizChange(){
+var biz=document.getElementById('sd-biz').value;
+fillScene(document.getElementById('sd-scene'),biz);
+// 境外隐藏国内字段
+document.getElementById('sd-domestic-fields').style.display=biz==='2'?'none':'';
+// 定实价显示联动
+sdCheckRealPrice();
+}
+function sdSceneChange(){sdCheckRealPrice();}
+
+// ============ 标签体系（标签组） ============
+// 全量标签：按分类（分层）组织，所有策略类型均可选全量标签
+var SD_TAG_CATEGORIES=[
+  {name:'时间分层',tags:['星期','入住日期','提前订','每日生效时间']},
+  {name:'酒店分层',tags:['城市id','poi美团评分','城市等级','hotelId','poi品牌','星级/档次','poi均价分','经营模式','合作模式','签约类型','poi定价方式','poi类型','poi主题','poiId','poi区域商圈','goods均价分','goods类型','roomId','goodsId','goods标签','是否保价','间夜消费水平','预订间夜','入住间夜','退款类型','早餐类型','可住人数','加床类型','床型','面积','楼层','窗户类型','是否连住','是否担保','包含服务','是否新商家','商家合同佣金率','是否KA','酒店集团','大区','省份','是否集团连锁','美团酒店交易等级','美团酒店流量等级','点评酒店交易等级','点评酒店流量等级','美团酒店低星交易等级','美团酒店低星流量等级','点评酒店低星交易等级','点评酒店低星流量等级','poi总间夜交易等级','poi总间夜流量等级','是否夜间到店','是否低价保价酒店','库存紧张度','最近N日订单量','POI低价比','基准卖价','竞对价差','竞对价差率','促后价','补贴力度','补贴系数','poi补贴敏感度','poi定价敏感度','供需指数','竞争指数','GMV贡献','间夜贡献','商家ARPU','商家月均GMV','货补ROI','poi活跃度','poi评分分位','住宿竞争力得分','住宿竞争力等级','是否重点poi','代理商id','代理活动id','goods接单类型','收益管理等级','是否可直连','是否酒店通','goods是否打包房','连住天数','OCC','goods活跃天数','渠道']},
+  {name:'行为分层',tags:['精搜-时长','首次精搜-时长','列表页坑位','本异地','用户意图','预订天数','预订房间数','预订间夜数']},
+  {name:'分销商分层',tags:['同业-间夜消费水平分位标','分销商二级渠道ID','分销商名称','分销商一级渠道类型','分销商一级渠道ID','分销商二级渠道类型','分销商等级','分销商品类','分销商结算方式','分销商合作模式']},
+  {name:'流量分层',tags:['是否联登']}
+];
+// 标签运算符（按标签类型简化为常见运算符集合）
+function sdTagOperators(tag){
+  var rangeTags=['提前订','poi美团评分','poi均价分','goods均价分','间夜消费水平','预订间夜','入住间夜','可住人数','面积','楼层','商家合同佣金率','库存紧张度','最近N日订单量','POI低价比','基准卖价','竞对价差','竞对价差率','促后价','补贴力度','补贴系数','poi补贴敏感度','poi定价敏感度','供需指数','竞争指数','GMV贡献','间夜贡献','商家ARPU','商家月均GMV','货补ROI','poi活跃度','poi评分分位','住宿竞争力得分','连住天数','OCC','goods活跃天数','同业-间夜消费水平分位标','精搜-时长','首次精搜-时长','列表页坑位','预订天数','预订房间数','预订间夜数'];
+  if(rangeTags.indexOf(tag)>=0) return ['大于','小于','区间','小于等于'];
+  return ['包含','不包含'];
+}
+
+var sdGroupSeq=0;       // 分层序号计数
+// 构建带搜索框 + 分类的标签下拉面板 HTML
+function sdBuildTagPicker(){
+  var html='';
+  SD_TAG_CATEGORIES.forEach(function(cat){
+    html+='<div class="tag-cat"><div class="tag-cat-hd">'+cat.name+'</div>';
+    cat.tags.forEach(function(t){
+      html+='<div class="tag-opt" data-name="'+t+'" onclick="sdPickTag(this)">'+t+'</div>';
+    });
+    html+='</div>';
+  });
+  return html;
+}
+
+// 进入策略详情页时初始化：清空并创建一个默认标签组
+function sdInitTagGroups(){
+  var wrap=document.getElementById('sd-tag-groups');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  sdGroupSeq=0;
+  addTagGroup();
+  // 默认分层名称
+  var first=wrap.querySelector('.tag-group .tag-group-name');
+  if(first) first.value='默认分组';
+}
+
+// 添加标签组（分层）
+function addTagGroup(){
+  sdGroupSeq++;
+  var seq=sdGroupSeq;
+  var wrap=document.getElementById('sd-tag-groups');
+  var div=document.createElement('div');
+  div.className='tag-group';
+  div.setAttribute('data-seq',seq);
+  div.innerHTML=
+    '<div class="tag-group-hd">'
+   +  '<span class="tag-group-no">分层序号 '+seq+'</span>'
+   +  '<input class="tag-group-name" type="text" placeholder="分层名称（如：默认分组）" value="">'
+   +  '<button class="btn-link red" onclick="removeTagGroup(this)">删除标签组</button>'
+   +'</div>'
+   +'<div class="tag-list"></div>'
+   +'<button class="btn-link" onclick="addTagToGroup(this)">+ 添加标签</button>';
+  wrap.appendChild(div);
+  // 新建标签组默认带一个标签
+  addTagToGroup(div.querySelector('button.btn-link'));
+}
+
+function removeTagGroup(btn){
+  btn.closest('.tag-group').remove();
+}
+
+// 在标签组内添加一个标签
+function addTagToGroup(btn){
+  var group=btn.closest('.tag-group');
+  var list=group.querySelector('.tag-list');
+  var seq=group.getAttribute('data-seq');
+  var tagSeq=list.children.length+1;
+  var row=document.createElement('div');
+  row.className='tag-row';
+  // 第一个标签不显示且/或选择器
+  var relHtml=list.children.length===0
+    ? '<span class="tag-rel-first">第一个</span>'
+    : '<select class="tag-rel"><option value="and">且</option><option value="or">或</option></select>';
+  row.innerHTML=
+     '<span class="tag-no">'+seq+'_'+tagSeq+'</span>'
+    +relHtml
+    +'<div class="tag-picker">'
+    +  '<div class="tag-picker-trigger" onclick="sdToggleTagPicker(this)"><span class="tag-picker-text" data-placeholder="请选择标签">请选择标签</span><span class="tag-picker-arr">▾</span></div>'
+    +  '<div class="tag-picker-pop">'
+    +    '<div class="tag-search-wrap"><input class="tag-search" type="text" placeholder="搜索标签关键词…" oninput="sdFilterTags(this)"></div>'
+    +    '<div class="tag-picker-body">'+sdBuildTagPicker()+'</div>'
+    +  '</div>'
+    +'</div>'
+    +'<select class="tag-op" style="display:none"></select>'
+    +'<input class="tag-val" type="text" placeholder="标签穷举/值" style="display:none;width:150px;height:28px;font-size:12px;border:1px solid #d9d9d9;border-radius:3px;padding:0 6px">'
+    +'<button class="btn-link red" onclick="removeTag(this)">删除</button>';
+  list.appendChild(row);
+}
+
+function removeTag(btn){
+  var row=btn.closest('.tag-row');
+  var list=row.parentElement;
+  row.remove();
+  sdRenumberTags(list);
+}
+
+// 删除标签后重新编号，并修正第一个标签的且/或显示
+function sdRenumberTags(list){
+  var seq=list.closest('.tag-group').getAttribute('data-seq');
+  Array.prototype.forEach.call(list.children,function(row,i){
+    row.querySelector('.tag-no').textContent=seq+'_'+(i+1);
+    var rel=row.querySelector('.tag-rel'),relFirst=row.querySelector('.tag-rel-first');
+    if(i===0){
+      if(rel){var sp=document.createElement('span');sp.className='tag-rel-first';sp.textContent='第一个';rel.replaceWith(sp);}
+    } else {
+      if(relFirst){var sel=document.createElement('select');sel.className='tag-rel';sel.innerHTML='<option value="and">且</option><option value="or">或</option>';relFirst.replaceWith(sel);}
+    }
+  });
+}
+
+// 展开/收起标签选择面板
+function sdToggleTagPicker(trigger){
+  var pop=trigger.nextElementSibling;
+  var open=pop.classList.contains('show');
+  // 关闭其它已打开的
+  document.querySelectorAll('.tag-picker-pop.show').forEach(function(p){p.classList.remove('show')});
+  if(!open){pop.classList.add('show');var s=pop.querySelector('.tag-search');if(s){s.value='';sdFilterTags(s);s.focus();}}
+}
+
+// 选中某个标签
+function sdPickTag(opt){
+  var name=opt.getAttribute('data-name');
+  var picker=opt.closest('.tag-picker');
+  var row=picker.closest('.tag-row');
+  picker.querySelector('.tag-picker-text').textContent=name;
+  picker.querySelector('.tag-picker-pop').classList.remove('show');
+  // 联动运算符 + 值输入框
+  var opSel=row.querySelector('.tag-op');
+  opSel.innerHTML='';
+  sdTagOperators(name).forEach(function(o){var op=document.createElement('option');op.textContent=o;opSel.appendChild(op);});
+  opSel.style.display='';
+  row.querySelector('.tag-val').style.display='';
+}
+
+// 关键词全局搜索过滤
+function sdFilterTags(input){
+  var kw=input.value.trim().toLowerCase();
+  var body=input.closest('.tag-picker-pop').querySelector('.tag-picker-body');
+  body.querySelectorAll('.tag-cat').forEach(function(cat){
+    var any=false;
+    cat.querySelectorAll('.tag-opt').forEach(function(opt){
+      var hit=opt.getAttribute('data-name').toLowerCase().indexOf(kw)>=0;
+      opt.style.display=hit?'':'none';
+      if(hit) any=true;
+    });
+    cat.style.display=any?'':'none';
+  });
+}
+
+// 点击空白处关闭已展开的标签选择面板
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.tag-picker')){
+    document.querySelectorAll('.tag-picker-pop.show').forEach(function(p){p.classList.remove('show')});
+  }
+});
+
+
+// === 渠道联动 ===
+function chCh(v,el){
+  if(v===0){var c=document.getElementById('ch5'),w=document.getElementById('ch5w');c.disabled=!el.checked;w.style.opacity=el.checked?'1':'.5';if(!el.checked)c.checked=false}
+  if(v===3){var c=document.getElementById('ch6'),w=document.getElementById('ch6w');c.disabled=!el.checked;w.style.opacity=el.checked?'1':'.5';if(!el.checked)c.checked=false}
+}
+
+// === 折叠面板 ===
+function togC(hd){hd.classList.toggle('open');hd.nextElementSibling.classList.toggle('open')}
+
+// === 活动详情联动 ===
+function adWayChange(){
+  var v=document.querySelector('input[name="ad-way"]:checked').value;
+  document.getElementById('ad-filter-mode').style.display=v==='0'?'':'none';
+  document.getElementById('ad-import-mode').style.display=v==='1'?'':'none';
+}
+function adAbChange(){
+  var v=document.querySelector('input[name="ad-ab"]:checked').value;
+  document.getElementById('ad-no-ab').style.display=v==='0'?'':'none';
+  document.getElementById('ad-ab-cfg').style.display=v==='1'?'':'none';
+}
+
+// === 供需策略action切换：控制方向和单位显隐 ===
+function supplyActionChange(sel){
+  var row=sel.closest('.comm-ctrl');
+  var dir=row.querySelector('.supply-dir');
+  var unit=row.querySelector('.supply-unit');
+  var v=sel.value;
+  // action=1(佣金率相对调整): 显示方向, 单位=pp
+  // action=0(佣金率绝对值调整到): 隐藏方向, 单位=%
+  if(v==='1'){
+    dir.style.display='';
+    unit.textContent='pp';
+  } else {
+    dir.style.display='none';
+    unit.textContent='%';
+  }
+}
+
+// === 竞争策略dialog内佣金率action切换 ===
+function compCommActionChange(sel){
+  var row=sel.closest('.ig');
+  var dir=row.querySelector('.comp-comm-dir');
+  var unit=row.querySelector('.comp-comm-unit');
+  var v=sel.value;
+  // 0=佣金率绝对值调整到: 隐藏方向, 单位=%
+  // 1=佣金率相对调整: 显示方向, 单位=pp
+  if(v==='1'){
+    if(dir) dir.style.display='';
+    if(unit) unit.textContent='pp';
+  } else {
+    if(dir) dir.style.display='none';
+    if(unit) unit.textContent='%';
+  }
+}
+
+// === 竞争策略类型切换 ===
+function compTypeChange(){
+  var v=document.querySelector('input[name="comp-type"]:checked').value;
+  document.getElementById('comp-bidding').style.display=v==='3'?'':'none';
+  document.getElementById('comp-anchor').style.display=v==='2'?'':'none';
+  document.getElementById('comp-sku').style.display=v==='4'?'':'none';
+  document.getElementById('comp-super-row').style.display=v==='3'?'':'none';
+}
+
+// === 竞争对手全选 ===
+function compAllSelect(el){
+  var card=el.closest('.comp-card');
+  var cbs=card.querySelectorAll('.comp-row:first-child .cg input[type=checkbox]');
+  cbs.forEach(function(cb){if(cb!==el)cb.checked=el.checked});
+}
+
+// === 价格层级联动：MT实价(0)→平台补贴区 / 非0→佣金率区 ===
+function compPriceLevelChange(){
+  var cbs=document.querySelectorAll('#comp-bidding .comp-card .comp-row:nth-child(2) input[type=checkbox]');
+  var has0=false, hasNon0=false;
+  cbs.forEach(function(cb){if(cb.checked){if(cb.value==='0')has0=true;else hasNon0=true;}});
+  document.getElementById('comp-subsidy-section').style.display=has0?'':'none';
+  document.getElementById('comp-commission-section').style.display=hasNon0?'':'none';
+  // 动态生成非0层级对应的价格配置行
+  if(hasNon0){
+    var rows='';
+    var map={'1':'目标com供应链价','2':'目标com商促后卖价','3':'目标com原价'};
+    cbs.forEach(function(cb){
+      if(cb.checked&&cb.value!=='0'){
+        rows+='<div class="comp-row"><label style="width:160px">'+map[cb.value]+'：</label><div class="ig"><select style="width:140px"><option>选中价格层对应COM价</option></select><span style="margin:0 4px">&times;</span><input type="number" value="1.00" step="0.01" style="width:70px"><select style="width:40px"><option value="0">+</option><option value="1">-</option></select><input type="number" value="0" step="0.001" style="width:60px"><span style="font-size:12px">元</span></div></div>';
+      }
+    });
+    document.getElementById('comp-com-price-rows').innerHTML=rows;
+  } else {
+    document.getElementById('comp-com-price-rows').innerHTML='';
+  }
+}
+</script>
 </body>
-</html> 
+</html>
